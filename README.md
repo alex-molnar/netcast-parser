@@ -8,7 +8,7 @@ A program megkönnyíti a meccsek utáni tudósítás készítését, kigyűjtve
     Kiadás dátuma: 2020. január 24.
 
 A szkript jelenleg a Firefox és Chrome böngészőkre telepíthető.
-A telepítéssel elfogadod a használat feltételeit és az adatvédelmi nyilatkozatot.
+A telepítéssel elfogadod a használat feltételeit és az adatvédelmi nyilatkozatot
 
 ## Telepítés
 
@@ -27,6 +27,9 @@ A telepítéssel elfogadod a használat feltételeit és az adatvédelmi nyilatk
 4. Nyiss meg bármelyik meccs statisztikáját a https://netcasting.webpont.com/ címen, és használd (vagy épp ne :)) egészséggel.
 
 ## Features
+
+### 2020.01.24
+* .docx fromátum támogatása
 
 ### 2020.01.12.
 * Initial commit

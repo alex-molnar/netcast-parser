@@ -4,8 +4,8 @@ Ez a Netcast Parser hivatalos oldala.
 
 A program megkönnyíti a meccsek utáni tudósítás készítését, kigyűjtve a dobott pontokat/hárompontosokat, abból esetégesen a sablonnak megfelelő docx formátumú doksit generál.
 
-    Legfrissebb verzió: 1.01
-    Kiadás dátuma: 2020. január 24.
+    Legfrissebb verzió: 1.20
+    Kiadás dátuma: 2020. február 8.
 
 A szkript jelenleg a Firefox és Chrome böngészőkre telepíthető.
 A telepítéssel elfogadod a használat feltételeit és az adatvédelmi nyilatkozatot

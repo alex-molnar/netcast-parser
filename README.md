@@ -28,6 +28,11 @@ A telepítéssel elfogadod a használat feltételeit és az adatvédelmi nyilatk
 
 ## Features
 
+### 2020.02.08
+* További információk beírásának lehetősége webes felületen
+* A Beírt információk is beíródnak a sablonba
+* Az összefoglalón és az értékelésen kívül minden (kitöltött mező esetén) adat automatikusan generálódik 
+
 ### 2020.01.24
 * .docx fromátum támogatása
 

@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Netcast Parser
 // @namespace    http://tampermonkey.net/
-// @version      1.2
+// @version      1.3
 // @description  Userscript to help automate certain tasks about writing summary of games.
 // @author       alex.molnar
 // @match        http://netcasting.webpont.com/*
@@ -36,6 +36,13 @@
         'away_coach_input_field'
     ];
 
+    let cookieAbleFields = [
+        'group_input_field',
+        'location_input_field',
+        'fans_input_field',
+        'home_coach_input_field',
+    ];
+
     let homeTeam;
     let awayTeam;
     let homeScore;
@@ -46,6 +53,8 @@
     let homeBench;
     let awayBench;
 
+
+    let cookieEnabled = true; // TODO: o be replaced by checkox
 
     // functional/higher order functions
 
@@ -60,10 +69,40 @@
         document.body.innerHTML = this.responseText;
         document.getElementById("backgroundModal").style.animation = "fadeIn 0.4s 1";
         document.getElementById("modalContent").style.animation = "fadeIn 1.0s 1";
+        cookieAbleFields.forEach(function(item, index) {
+            document.getElementById(item).value = getCookie(item);
+        });
+        sendRequest(`https://kingbrady.web.elte.hu/netcast/get_coach.php?team=${awayTeam}`, callBackJSON);
     }
 
+    function callBackJSON() {
+        document.getElementById("away_coach_input_field").value = JSON.parse(this.responseText).coach ? JSON.parse(this.responseText).coach : "";
+    }
+
+    function getReferees() {
+        var doc = new DOMParser().parseFromString(this.responseText, 'text/html');
+        Array.from(doc.getElementsByClassName("padding-left-twentyfive")).forEach(function(item, index){
+            let teamName = item.innerHTML.split("</span>")[1];
+
+            if (teamName === homeTeam + "</a>" && item.nextElementSibling.innerHTML.split("</span>")[1] === awayTeam + "</a>") {
+                let referees = item.parentNode.nextElementSibling.firstElementChild.innerHTML.split("<b>")[1].slice(0, -4).split(",");
+                Array.from(document.getElementsByClassName("referee-name")).forEach((item, index) => {
+                    item.value = referees[index];
+                });
+            }
+        });
+    }
 
     // helper functions
+
+    function sendRequest(url, callback){
+        var oReq = new XMLHttpRequest();
+        if(callback !== null){
+            oReq.addEventListener("load", callback);
+        }
+        oReq.open("GET", url);
+        oReq.send();
+    }
 
     function connectEventListeners(){
         document.getElementById('redirectButton').addEventListener('click', redirectToNetcastServer);
@@ -97,6 +136,21 @@
         return Array.from(elem.classList).includes("starter");
     }
 
+    function getCookie(cname) {
+        var name = cname + "=";
+        var decodedCookie = decodeURIComponent(document.cookie);
+        var ca = decodedCookie.split(';');
+        for(var i = 0; i <ca.length; i++) {
+            var c = ca[i];
+            while (c.charAt(0) == ' ') {
+                c = c.substring(1);
+            }
+            if (c.indexOf(name) == 0) {
+                return c.substring(name.length, c.length);
+            }
+        }
+        return "";
+    }
 
     // parser functions
 
@@ -149,7 +203,6 @@
         awayBench = getPlayers(false, false);
     }
 
-
     //builder functions
 
     function buildTXTFile() {
@@ -171,18 +224,9 @@
         });
     }
 
-
     // manipulating hmtl
 
-    function popDialog(){
-        var oReq = new XMLHttpRequest();
-        oReq.addEventListener("load", callBackHTML);
-        oReq.open("GET", "https://people.inf.elte.hu/qbbwwd/netcast/innerh.php");
-        oReq.send();
-    }
-
     function closeDialog(close) {
-        console.log(close);
         if (close) {
             document.getElementById("modalContent").style.animation = "fadeOut 0.4s 1";
             setTimeout(function() { closeDialog(false); }, 400);
@@ -213,7 +257,7 @@
     }
 
     function redirectToNetcastServer() {
-        let address = "https://people.inf.elte.hu/qbbwwd/netcast/netcast_server.php";
+        let address = "https://kingbrady.web.elte.hu/netcast/netcast_server.php";
         address += `?hometeam=${homeTeam}&awayteam=${awayTeam}`;
         address += `&homescore=${homeScore}&awayscore=${awayScore}`;
         address += `&quarterscore=${quarterScore}`;
@@ -224,6 +268,12 @@
                 let val = document.getElementById(item).value;
                 if(val.trim() != '') {
                     address += `&${item}=${val}`;
+                    if(cookieAbleFields.indexOf(item) > -1) {
+                        document.cookie = item + "=" + val + "; expires=Thu, 27 May 2021 12:00:00 UTC;";
+                    }
+                    if(item === "away_coach_input_field"){
+                        sendRequest(`https://kingbrady.web.elte.hu/netcast/update.php?team=${awayTeam}&coach=${val}`, null);
+                    }
                 }
             });
         }
@@ -235,12 +285,15 @@
 
     function main() {
         parseData();
-        popDialog();
+        sendRequest(`http://kingbrady.web.elte.hu/netcast/curl.php`, getReferees);
+        sendRequest("https://kingbrady.web.elte.hu/netcast/innerh.php", callBackHTML);
         setTimeout(connectEventListeners, 1000);
     }
 
 
-    // entrypoint delay
+    // entrypoint on page load
 
-    setTimeout(main, 6000);
+    window.addEventListener('load', function(){
+        setTimeout(main, 1000);
+    });
 })();

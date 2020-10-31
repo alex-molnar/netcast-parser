@@ -21,7 +21,6 @@ $homescore = $_GET["homescore"];
 $awayscore = $_GET["awayscore"];
 $quarterscore = $_GET["quarterscore"];
 $city = $_GET["location_input_field"] ?? "{helyszín}";
-$court = "TODO: court";
 $fansnum = $_GET["fans_input_field"] ?? "{nézőszám}";
 $referees = isset($_GET["ref1_input_field"]) && $_GET["ref2_input_field"] ? ($_GET["ref1_input_field"] . ", " .$_GET["ref2_input_field"]) : "{játékvezetők}";
 // TODO: játékvezetők
